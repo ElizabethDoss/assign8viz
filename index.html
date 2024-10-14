@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>replit</title>
+    <script src="https://d3js.org/d3.v3.min.js"></script>
+  </head>
+
+  <body>
+    <svg
+      style="width: 1000px; height: 1000px; border: 1px lightgray solid"
+    ></svg>
+
+    <script>
+      d3.json("insects.json", function (data) {
+        dataViz(data);
+      });
+
+      function dataViz(incomingData) {
+        var insectSort = d3
+          .nest()
+          .key(function (d) {
+            return d.year;
+          })
+          .entries(incomingData);
+        insectSort.forEach(function (d) {
+          d.yearNumb = d.values.length;
+        });
+
+        var maxCaught = d3.max(insectSort, function (d) {
+          return d.yearNumb;
+        });
+        var yScale = d3.scale
+          .linear()
+          .domain([0, maxCaught])
+          .range([0, 10000000]);
+
+        d3.select("svg")
+          .selectAll("rect")
+          .data(insectSort)
+          .enter()
+          .append("rect")
+          .attr("width", 40) // fixed value for each bar width
+          .attr("height", function (d) {
+            return yScale(d.yearNumb);
+          })
+          .attr("x", function (d, i) {
+            return i * 100;
+          }) // fixed start for a bar box
+          .attr("y", function (d) {
+            return 10000 - yScale(d.yearNumb);
+          })
+          .style("fill", "blue")
+          .style("stroke", "red")
+          .style("stroke-width", "1px")
+          .style("opacity", 0.25);
+      }
+    </script>
+
+    <!--
+  This script places a badge on your repl's full-browser view back to your repl's cover
+  page. Try various colors for the theme: dark, light, red, orange, yellow, lime, green,
+  teal, blue, blurple, magenta, pink!
+  -->
+    <script
+      src="https://replit.com/public/js/replit-badge-v2.js"
+      theme="dark"
+      position="bottom-right"
+    ></script>
+  </body>
+</html>
